@@ -46,6 +46,7 @@ PHP_FUNCTION(dirname);
 PHP_FUNCTION(pathinfo);
 PHP_FUNCTION(strstr);
 PHP_FUNCTION(strpos);
+PHP_FUNCTION(bm_strpos);
 PHP_FUNCTION(stripos);
 PHP_FUNCTION(strrpos);
 PHP_FUNCTION(strripos);

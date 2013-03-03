@@ -1845,6 +1845,116 @@ PHP_FUNCTION(strpos)
 }
 /* }}} */
 
+#define ALPHABET_LEN 255
+#define NOT_FOUND patlen
+#define max(a, b) ((a < b) ? b : a)
+
+static void make_delta1(int *delta1, uint8_t *pat, int32_t patlen)
+{
+	int i;
+	for (i=0; i < ALPHABET_LEN; i++) {
+		delta1[i] = NOT_FOUND;
+	}
+	for (i=0; i < patlen-1; i++) {
+		delta1[pat[i]] = patlen-1 - i;
+	}
+}
+
+static int is_prefix(uint8_t *word, int wordlen, int pos)
+{
+	int i;
+	int suffixlen = wordlen - pos;
+
+	// could also use the strncmp() library function here
+	for (i = 0; i < suffixlen; i++) {
+		if (word[i] != word[pos+i]) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+static int suffix_length(uint8_t *word, int wordlen, int pos)
+{
+	int i;
+
+	// increment suffix length i to the first mismatch or beginning
+	// of the word
+	for (i = 0; (word[pos-i] == word[wordlen-1-i]) && (i < pos); i++);
+
+	return i;
+}
+
+static void make_delta2(int *delta2, uint8_t *pat, int32_t patlen)
+{
+	int p;
+	int last_prefix_index = patlen-1;
+
+	// first loop
+    for (p=patlen-1; p>=0; p--) {
+        if (is_prefix(pat, patlen, p+1)) {
+            last_prefix_index = p+1;
+        }
+        delta2[p] = last_prefix_index + (patlen-1 - p);
+    }
+ 
+    // second loop
+    for (p=0; p < patlen-1; p++) {
+        int slen = suffix_length(pat, patlen, p);
+        if (pat[p - slen] != pat[patlen-1 - slen]) {
+            delta2[patlen-1 - slen] = patlen-1 - p + slen;
+        }
+    }
+}
+
+static uint8_t* boyer_moore (uint8_t *string, uint32_t stringlen, uint8_t *pat, uint32_t patlen) 
+{
+    int i;
+    int delta1[ALPHABET_LEN];
+    int *delta2 = malloc(patlen * sizeof(int));
+    make_delta1(delta1, pat, patlen);
+    make_delta2(delta2, pat, patlen);
+ 
+    i = patlen-1;
+    while (i < stringlen) {
+        int j = patlen-1;
+        while (j >= 0 && (string[i] == pat[j])) {
+            --i;
+            --j;
+        }
+        if (j < 0) {
+            free(delta2);
+            return (string + i+1);
+        }
+ 
+        i += max(delta1[string[i]], delta2[j]);
+    }
+    free(delta2);
+    return NULL;
+}
+
+
+PHP_FUNCTION(bm_strpos)
+{
+	char *needle;
+	char *haystack;
+	int haystack_len, needle_len;
+
+	char *found;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &haystack, &haystack_len, &needle, &needle_len) == FAILURE) {
+		return;
+	}
+
+	found = boyer_moore(haystack, haystack_len, needle, needle_len);
+
+	if (found) {
+		RETURN_LONG(found - haystack);
+	} else {
+		RETURN_FALSE;
+	}
+}
+
 /* {{{ proto int stripos(string haystack, string needle [, int offset])
    Finds position of first occurrence of a string within another, case insensitive */
 PHP_FUNCTION(stripos)
