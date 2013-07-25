@@ -18,10 +18,13 @@ var_dump( array_product() );
 echo "\n-- Testing array_product() function with more than expected no. of arguments --\n";
 $input = array(1, 2);
 $extra_arg = 10;
-var_dump( array_product($input, $extra_arg) );
+var_dump( array_product($input, 'is_numeric', $extra_arg) );
 
 echo "\n-- Testing array_product() function incorrect argument type --\n";
 var_dump( array_product("bob") );
+
+echo "\n-- Testing array_product() function incorrect second argument type --\n";
+var_dump( array_product($input, $input) );
 
 ?>
 ===DONE===
@@ -30,16 +33,21 @@ var_dump( array_product("bob") );
 
 -- Testing array_product() function with Zero arguments --
 
-Warning: array_product() expects exactly 1 parameter, 0 given in %sarray_product_error.php on line %d
+Warning: array_product() expects at least 1 parameter, 0 given in %sarray_product_error.php on line %d
 NULL
 
 -- Testing array_product() function with more than expected no. of arguments --
 
-Warning: array_product() expects exactly 1 parameter, 2 given in %sarray_product_error.php on line %d
+Warning: array_product() expects at most 2 parameters, 3 given in %sarray_product_error.php on line %d
 NULL
 
 -- Testing array_product() function incorrect argument type --
 
 Warning: array_product() expects parameter 1 to be array, string given in %sarray_product_error.php on line %d
+NULL
+
+-- Testing array_product() function incorrect second argument type --
+
+Warning: array_product() expects parameter 2 to be a valid callback, first array member is not a valid class name or object in /home/tjerk/work/php/php-src/ext/standard/tests/array/array_product_error.php on line 24
 NULL
 ===DONE===

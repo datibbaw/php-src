@@ -576,8 +576,9 @@ ZEND_BEGIN_ARG_INFO(arginfo_array_sum, 0)
 	ZEND_ARG_INFO(0, arg) /* ARRAY_INFO(0, arg, 0) */
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO(arginfo_array_product, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_product, 0, 0, 1)
 	ZEND_ARG_INFO(0, arg) /* ARRAY_INFO(0, arg, 0) */
+	ZEND_ARG_INFO(0, callback)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_array_reduce, 0, 0, 2)

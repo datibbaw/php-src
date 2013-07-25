@@ -4059,10 +4059,14 @@ PHP_FUNCTION(array_product)
 	zval *input,
 		 **entry,
 		 entry_n;
+	zend_bool have_callback = 0;
+	zend_fcall_info fci;
+	zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
+	zval **args[1], *retval;
 	HashPosition pos;
 	double dval;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &input) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a|f", &input, &fci, &fci_cache) == FAILURE) {
 		return;
 	}
 
@@ -4071,10 +4075,25 @@ PHP_FUNCTION(array_product)
 		return;
 	}
 
+	if (ZEND_NUM_ARGS() > 1) {
+		have_callback = 1;
+		fci.retval_ptr_ptr = &retval;
+		fci.no_separation = 0;
+		fci.param_count = 1;
+	}
+
 	for (zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(input), &pos);
 		zend_hash_get_current_data_ex(Z_ARRVAL_P(input), (void **)&entry, &pos) == SUCCESS;
 		zend_hash_move_forward_ex(Z_ARRVAL_P(input), &pos)
 	) {
+		if (have_callback) {
+			args[0] = entry;
+			fci.params = args;
+
+			if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS && retval) {
+				entry = &retval;
+			}
+		}
 		if (Z_TYPE_PP(entry) == IS_ARRAY || Z_TYPE_PP(entry) == IS_OBJECT) {
 			continue;
 		}
