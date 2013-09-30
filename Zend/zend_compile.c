@@ -6513,6 +6513,16 @@ void zend_do_jmp_set(const znode *value, znode *jmp_token, znode *colon_token TS
 }
 /* }}} */
 
+void zend_do_exist_jmp_set(const znode *value, znode *jmp_token, znode *jmp_token2, znode *colon_token TSRMLS_DC)
+{
+	zend_do_jmp_set(value, jmp_token, colon_token TSRMLS_CC);
+}
+
+void zend_do_exist_jmp_set_else(znode *result, const znode *false_value, const znode *jmp_token, const znode *jmp_token2, const znode *colon_token)
+{
+	zend_do_jmp_set_else(result, false_value, jmp_token, colon_token);
+}
+
 void zend_do_jmp_set_else(znode *result, const znode *false_value, const znode *jmp_token, const znode *colon_token TSRMLS_DC) /* {{{ */
 {
 	zend_op *opline = get_next_op(CG(active_op_array) TSRMLS_CC);
