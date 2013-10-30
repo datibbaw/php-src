@@ -30,6 +30,8 @@
 
 static int php_opt_error(int argc, char * const *argv, int oint, int optchr, int err, int show_err) /* {{{ */
 {
+	php_opterr = 1;
+
 	if (show_err)
 	{
 		fprintf(stderr, "Error in argument %d, char %d: ", oint, optchr+1);
@@ -54,6 +56,7 @@ static int php_opt_error(int argc, char * const *argv, int oint, int optchr, int
 /* }}} */
 
 PHPAPI int php_optidx = -1;
+PHPAPI zend_bool php_opterr = 0;
 
 PHPAPI int php_getopt(int argc, char* const *argv, const opt_struct opts[], char **optarg, int *optind, int show_err, int arg_start) /* {{{ */
 {

@@ -1318,6 +1318,9 @@ int main(int argc, char *argv[])
 			case 'h': /* help & quit */
 			case '?':
 				php_cli_usage(argv[0]);
+				if (php_opterr) {
+					exit_status = 1;
+				}
 				goto out;
 			case 'i': case 'v': case 'm':
 				sapi_module = &cli_sapi_module;
