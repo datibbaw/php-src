@@ -213,6 +213,7 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %token T_DIR             "__DIR__ (T_DIR)"
 %token T_NS_SEPARATOR    "\\ (T_NS_SEPARATOR)"
 %token T_ELLIPSIS        "... (T_ELLIPSIS)"
+%token T_POW             "** (T_POW)"
 
 %% /* Rules */
 
@@ -774,6 +775,7 @@ expr_without_variable:
 	|	expr '+' expr 	{ zend_do_binary_op(ZEND_ADD, &$$, &$1, &$3 TSRMLS_CC); }
 	|	expr '-' expr 	{ zend_do_binary_op(ZEND_SUB, &$$, &$1, &$3 TSRMLS_CC); }
 	|	expr '*' expr	{ zend_do_binary_op(ZEND_MUL, &$$, &$1, &$3 TSRMLS_CC); }
+	|	expr T_POW expr	{ zend_do_binary_op(ZEND_MUL, &$$, &$1, &$3 TSRMLS_CC); }
 	|	expr '/' expr	{ zend_do_binary_op(ZEND_DIV, &$$, &$1, &$3 TSRMLS_CC); }
 	|	expr '%' expr 	{ zend_do_binary_op(ZEND_MOD, &$$, &$1, &$3 TSRMLS_CC); }
 	| 	expr T_SL expr	{ zend_do_binary_op(ZEND_SL, &$$, &$1, &$3 TSRMLS_CC); }
