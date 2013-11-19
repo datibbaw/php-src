@@ -100,7 +100,7 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %nonassoc '<' T_IS_SMALLER_OR_EQUAL '>' T_IS_GREATER_OR_EQUAL
 %token T_IS_SMALLER_OR_EQUAL "<= (T_IS_SMALLER_OR_EQUAL)"
 %token T_IS_GREATER_OR_EQUAL ">= (T_IS_GREATER_OR_EQUAL)"
-%left T_SL T_SR
+%left T_SL T_SR T_POW
 %token T_SL "<< (T_SL)"
 %token T_SR ">> (T_SR)"
 %left '+' '-' '.'
