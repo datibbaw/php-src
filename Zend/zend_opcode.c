@@ -760,6 +760,7 @@ ZEND_API binary_op_type get_binary_op(int opcode)
 			return (binary_op_type) sub_function;
 			break;
 		case ZEND_MUL:
+		case ZEND_POW:
 		case ZEND_ASSIGN_MUL:
 			return (binary_op_type) mul_function;
 			break;
