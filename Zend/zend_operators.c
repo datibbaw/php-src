@@ -963,6 +963,12 @@ ZEND_API int mul_function(zval *result, zval *op1, zval *op2 TSRMLS_DC) /* {{{ *
 }
 /* }}} */
 
+ZEND_API int pow_function(zval *result, zval *op1, zval *op2 TSRMLS_DC)
+{
+	Z_TYPE_P(result) = IS_LONG;
+	Z_LVAL_P(result) = 42;
+}
+
 ZEND_API int div_function(zval *result, zval *op1, zval *op2 TSRMLS_DC) /* {{{ */
 {
 	zval op1_copy, op2_copy;

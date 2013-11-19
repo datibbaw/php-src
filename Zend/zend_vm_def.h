@@ -5470,7 +5470,7 @@ ZEND_VM_HANDLER(165, ZEND_POW, CONST|TMP|VAR|CV, CONST|TMP|VAR|CV)
 	zend_free_op free_op1, free_op2;
 
 	SAVE_OPLINE();
-	fast_mul_function(&EX_T(opline->result.var).tmp_var,
+	pow_function(&EX_T(opline->result.var).tmp_var,
 		GET_OP1_ZVAL_PTR(BP_VAR_R),
 		GET_OP2_ZVAL_PTR(BP_VAR_R) TSRMLS_CC);
 	FREE_OP1();
