@@ -34,6 +34,7 @@
 #include "spl_iterators.h"
 #include "spl_exceptions.h"
 #include "spl_observer.h"
+#include "spl_callable.h"
 #include "spl_dllist.h"
 #include "spl_fixedarray.h"
 #include "spl_heap.h"
@@ -948,6 +949,7 @@ PHP_MINIT_FUNCTION(spl)
 	PHP_MINIT(spl_heap)(INIT_FUNC_ARGS_PASSTHRU);
 	PHP_MINIT(spl_fixedarray)(INIT_FUNC_ARGS_PASSTHRU);
 	PHP_MINIT(spl_observer)(INIT_FUNC_ARGS_PASSTHRU);
+	PHP_MINIT(spl_callable)(INIT_FUNC_ARGS_PASSTHRU);
 
 	return SUCCESS;
 }
