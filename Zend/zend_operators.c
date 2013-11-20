@@ -970,43 +970,45 @@ ZEND_API int pow_function(zval *result, zval *op1, zval *op2 TSRMLS_DC)
 
 	while (1) {
 		switch (TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))) {
-			case TYPE_PAIR(IS_LONG, IS_LONG): {
-				long l1 = 1, l2 = Z_LVAL_P(op1), i = Z_LVAL_P(op2);
+			case TYPE_PAIR(IS_LONG, IS_LONG):
+				if (Z_LVAL_P(op2) >= 0) {
+					long l1 = 1, l2 = Z_LVAL_P(op1), i = Z_LVAL_P(op2);
 
-				if (i == 0) {
-					ZVAL_LONG(result, 1L);
-					return SUCCESS;
-				} else if (l2 == 0) {
-					ZVAL_LONG(result, 0);
-					return SUCCESS;
-				}
-
-				while (i >= 1) {
-					long overflow;
-					double dval = 0.0;
-
-					if (i % 2) {
-						--i;
-						ZEND_SIGNED_MULTIPLY_LONG(l1, l2, l1, dval, overflow);
-						if (overflow) {
-							ZVAL_DOUBLE(result, dval * pow(l2, i));
-							return SUCCESS;
-						}
-					} else {
-						i /= 2;
-						ZEND_SIGNED_MULTIPLY_LONG(l2, l2, l2, dval, overflow);
-						if (overflow) {
-							ZVAL_DOUBLE(result, (double)l1 * pow(dval, i));
-							return SUCCESS;
-						}
-					}
 					if (i == 0) {
-						ZVAL_LONG(result, l1);
+						ZVAL_LONG(result, 1L);
+						return SUCCESS;
+					} else if (l2 == 0) {
+						ZVAL_LONG(result, 0);
 						return SUCCESS;
 					}
+
+					while (i >= 1) {
+						long overflow;
+						double dval = 0.0;
+
+						if (i % 2) {
+							--i;
+							ZEND_SIGNED_MULTIPLY_LONG(l1, l2, l1, dval, overflow);
+							if (overflow) {
+								ZVAL_DOUBLE(result, dval * pow(l2, i));
+								return SUCCESS;
+							}
+						} else {
+							i /= 2;
+							ZEND_SIGNED_MULTIPLY_LONG(l2, l2, l2, dval, overflow);
+							if (overflow) {
+								ZVAL_DOUBLE(result, (double)l1 * pow(dval, i));
+								return SUCCESS;
+							}
+						}
+					}
+					/* i == 0 */
+					ZVAL_LONG(result, l1);
+				} else {
+					ZVAL_DOUBLE(result, pow((double)Z_LVAL_P(op1), (double)Z_LVAL_P(op2)));
 				}
-				break;
-			}
+				return SUCCESS;
+
 			case TYPE_PAIR(IS_LONG, IS_DOUBLE):
 				ZVAL_DOUBLE(result, pow((double)Z_LVAL_P(op1), Z_DVAL_P(op2)));
 				return SUCCESS;
