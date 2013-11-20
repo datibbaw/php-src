@@ -431,6 +431,7 @@ implements_list:
 
 interface_list:
 		fully_qualified_class_name			{ zend_do_implements_interface(&$1 TSRMLS_CC); }
+	|	T_CALLABLE { Z_STRVAL($1.u.constant) = "Callable"; Z_STRLEN($1.u.constant) = 8; zend_do_implements_interface(&$1 TSRMLS_CC); }
 	|	interface_list ',' fully_qualified_class_name { zend_do_implements_interface(&$3 TSRMLS_CC); }
 ;
 
