@@ -100,7 +100,7 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %nonassoc '<' T_IS_SMALLER_OR_EQUAL '>' T_IS_GREATER_OR_EQUAL
 %token T_IS_SMALLER_OR_EQUAL "<= (T_IS_SMALLER_OR_EQUAL)"
 %token T_IS_GREATER_OR_EQUAL ">= (T_IS_GREATER_OR_EQUAL)"
-%left T_SL T_SR T_POW
+%left T_SL T_SR
 %token T_SL "<< (T_SL)"
 %token T_SR ">> (T_SR)"
 %left '+' '-' '.'
@@ -109,6 +109,7 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %nonassoc T_INSTANCEOF
 %token T_INSTANCEOF  "instanceof (T_INSTANCEOF)"
 %right '~' T_INC T_DEC T_INT_CAST T_DOUBLE_CAST T_STRING_CAST T_ARRAY_CAST T_OBJECT_CAST T_BOOL_CAST T_UNSET_CAST '@'
+%right T_POW
 %token T_INC "++ (T_INC)"
 %token T_DEC "-- (T_DEC)"
 %token T_INT_CAST    "(int) (T_INT_CAST)"
