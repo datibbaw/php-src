@@ -166,3 +166,4 @@
 #define ZEND_FAST_RET                        163
 #define ZEND_RECV_VARIADIC                   164
 #define ZEND_POW                             165
+#define ZEND_ASSIGN_POW                      166
