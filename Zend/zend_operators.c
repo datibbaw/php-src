@@ -1025,8 +1025,16 @@ ZEND_API int pow_function(zval *result, zval *op1, zval *op2 TSRMLS_DC)
 				if (!converted) {
 					ZEND_TRY_BINARY_OBJECT_OPERATION(ZEND_POW);
 
-					zendi_convert_scalar_to_number(op1, op1_copy, result);
-					zendi_convert_scalar_to_number(op2, op2_copy, result);
+					if (Z_TYPE_P(op1) == IS_ARRAY) {
+						ZVAL_LONG(op1, 0);
+					} else {
+						zendi_convert_scalar_to_number(op1, op1_copy, result);
+					}
+					if (Z_TYPE_P(op2) == IS_ARRAY) {
+						ZVAL_LONG(op2, 0);
+					} else {
+						zendi_convert_scalar_to_number(op2, op2_copy, result);
+					}
 					converted = 1;
 				} else {
 					zend_error(E_ERROR, "Unsupported operand types");

@@ -180,6 +180,7 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %token T_VAR        "var (T_VAR)"
 %token T_UNSET      "unset (T_UNSET)"
 %token T_ISSET      "isset (T_ISSET)"
+%token T_POWFN      "pow (T_POW)"
 %token T_EMPTY      "empty (T_EMPTY)"
 %token T_HALT_COMPILER "__halt_compiler (T_HALT_COMPILER)"
 %token T_CLASS      "class (T_CLASS)"
@@ -1198,6 +1199,7 @@ internal_functions_in_yacc:
 	|	T_EVAL '(' expr ')' 	{ zend_do_include_or_eval(ZEND_EVAL, &$$, &$3 TSRMLS_CC); }
 	|	T_REQUIRE expr			{ zend_do_include_or_eval(ZEND_REQUIRE, &$$, &$2 TSRMLS_CC); }
 	|	T_REQUIRE_ONCE expr		{ zend_do_include_or_eval(ZEND_REQUIRE_ONCE, &$$, &$2 TSRMLS_CC); }
+	|	T_POWFN '(' expr ',' expr ')'	{ zend_do_binary_op(ZEND_POW, &$$, &$3, &$5 TSRMLS_CC); }
 ;
 
 isset_variables:
