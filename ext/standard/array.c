@@ -130,6 +130,9 @@ PHP_MINIT_FUNCTION(array) /* {{{ */
 	REGISTER_LONG_CONSTANT("ARRAY_FILTER_USE_BOTH", ARRAY_FILTER_USE_BOTH, CONST_CS | CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("ARRAY_FILTER_USE_KEY", ARRAY_FILTER_USE_KEY, CONST_CS | CONST_PERSISTENT);
 
+	REGISTER_LONG_CONSTANT("ARRAY_USEARCH_USE_KEY", ARRAY_USEARCH_USE_KEY, CONST_CS | CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("ARRAY_USEARCH_INVERT", ARRAY_USEARCH_INVERT, CONST_CS | CONST_PERSISTENT);
+
 	return SUCCESS;
 }
 /* }}} */
@@ -1227,6 +1230,75 @@ PHP_FUNCTION(array_search)
 	php_search_array(INTERNAL_FUNCTION_PARAM_PASSTHRU, 1);
 }
 /* }}} */
+
+PHP_FUNCTION(array_usearch)
+{
+	HashTable *array;
+	HashPosition pos;
+
+	zend_fcall_info fci;
+	zend_fcall_info_cache fcc;
+	zval **args[2], *retval, *key = NULL, **entry;
+
+	int flags = 0, xor_mask = 0;
+	zend_bool use_keys = 0;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Hf|l", &array, &fci, &fcc, &flags) == FAILURE) {
+		return;
+	}
+
+    if (flags & ARRAY_USEARCH_USE_KEY) {
+    	fci.param_count = 2;
+        MAKE_STD_ZVAL(key);
+        args[1] = &key;
+
+        use_keys = 1;
+    } else {
+    	fci.param_count = 1;
+    }
+
+    if (flags & ARRAY_USEARCH_INVERT) {
+        xor_mask = 1;
+    }
+
+	fci.params = args;
+	fci.no_separation = 0;
+	fci.retval_ptr_ptr = &retval;
+
+	zend_hash_internal_pointer_reset_ex(array, &pos);
+	while (zend_hash_get_current_data_ex(array, (void **)&entry, &pos) == SUCCESS) {
+		zend_bool found = 0;
+
+		args[0] = entry;
+		if (use_keys) {
+    		zend_hash_get_current_key_zval_ex(array, key, &pos);
+		}
+
+		if (zend_call_function(&fci, &fcc TSRMLS_CC) == SUCCESS) {
+			found = zend_is_true(retval TSRMLS_CC) ^ xor_mask;
+			zval_ptr_dtor(&retval);
+		} else {
+			break;
+		}
+
+		if (found) {
+    		if (use_keys) {
+	    		RETURN_ZVAL(key, 0, 1);
+            } else {
+                zend_hash_get_current_key_zval_ex(array, return_value, &pos);
+                return;
+            }
+		}
+
+		zend_hash_move_forward_ex(array, &pos);
+	}
+
+    if (use_keys) {
+    	zval_ptr_dtor(&key);
+    }
+
+	RETURN_FALSE;
+}
 
 static int php_valid_var_name(char *var_name, int var_name_len) /* {{{ */
 {

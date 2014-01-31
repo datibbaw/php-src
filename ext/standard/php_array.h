@@ -49,6 +49,7 @@ PHP_FUNCTION(current);
 PHP_FUNCTION(key);
 PHP_FUNCTION(min);
 PHP_FUNCTION(max);
+PHP_FUNCTION(array_usearch);
 PHP_FUNCTION(in_array);
 PHP_FUNCTION(array_search);
 PHP_FUNCTION(extract);
@@ -119,6 +120,9 @@ PHPAPI int php_multisort_compare(const void *a, const void *b TSRMLS_DC);
 
 #define ARRAY_FILTER_USE_BOTH	1
 #define ARRAY_FILTER_USE_KEY	2
+
+#define ARRAY_USEARCH_USE_KEY	1
+#define ARRAY_USEARCH_INVERT	2
 
 ZEND_BEGIN_MODULE_GLOBALS(array) 
 	int *multisort_flags[2];

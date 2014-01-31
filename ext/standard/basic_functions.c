@@ -320,6 +320,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_walk_recursive, 0, 0, 2)
 	ZEND_ARG_INFO(0, userdata)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_usearch, 0, 0, 2)
+	ZEND_ARG_INFO(0, input)
+	ZEND_ARG_INFO(0, callback_search_func)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_in_array, 0, 0, 2)
 	ZEND_ARG_INFO(0, needle)
 	ZEND_ARG_INFO(0, haystack) /* ARRAY_INFO(0, haystack, 0) */
@@ -3311,6 +3316,7 @@ const zend_function_entry basic_functions[] = { /* {{{ */
 	PHP_FE(key,																arginfo_key)
 	PHP_FE(min,																arginfo_min)
 	PHP_FE(max,																arginfo_max)
+	PHP_FE(array_usearch,													arginfo_array_usearch)
 	PHP_FE(in_array,														arginfo_in_array)
 	PHP_FE(array_search,													arginfo_array_search)
 	PHP_FE(extract,															arginfo_extract)
