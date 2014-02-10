@@ -739,7 +739,7 @@ PHP_FUNCTION(hash_equals)
 	}
 
 	known_padded = (char *)ecalloc(1, known_len + given_len);
-	memcpy(known, known_padded, known_len);
+	memcpy(known_padded, known, known_len);
 
 	result = known_len - given_len;
 
