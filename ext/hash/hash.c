@@ -729,6 +729,29 @@ PHP_FUNCTION(hash_pbkdf2)
 }
 /* }}} */
 
+PHP_FUNCTION(hash_equals)
+{
+	char *known, *given, *known_padded;
+	int known_len, given_len, i, result;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &known, &known_len, &given, &given_len) == FAILURE) {
+		return;
+	}
+
+	known_padded = (char *)ecalloc(1, known_len + given_len);
+	memcpy(known, known_padded, known_len);
+
+	result = known_len - given_len;
+
+	for (i = 0; i < given_len; ++i) {
+		result |= given[i] ^ known_padded[i];
+	}
+
+	efree(known_padded);
+
+	RETVAL_BOOL(result == 0);
+}
+
 /* Module Housekeeping */
 
 static void php_hash_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC) /* {{{ */
@@ -880,6 +903,7 @@ PHP_FUNCTION(mhash_get_block_size)
 	}
 }
 /* }}} */
+
 
 #define SALT_SIZE 8
 
@@ -1178,6 +1202,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mhash, 0, 0, 2)
 ZEND_END_ARG_INFO()
 #endif
 
+ZEND_BEGIN_ARG_INFO(arginfo_hash_equals, 0)
+	ZEND_ARG_INFO(0, known)
+	ZEND_ARG_INFO(0, given)
+ZEND_END_ARG_INFO()
+
 /* }}} */
 
 /* {{{ hash_functions[]
@@ -1198,6 +1227,7 @@ const zend_function_entry hash_functions[] = {
 
 	PHP_FE(hash_algos,								arginfo_hash_algos)
 	PHP_FE(hash_pbkdf2,								arginfo_hash_pbkdf2)
+	PHP_FE(hash_equals,								arginfo_hash_equals)
 
 	/* BC Land */
 #ifdef PHP_HASH_MD5_NOT_IN_CORE
