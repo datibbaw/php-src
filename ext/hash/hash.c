@@ -731,23 +731,26 @@ PHP_FUNCTION(hash_pbkdf2)
 
 PHP_FUNCTION(hash_equals)
 {
-	char *known, *given, *known_padded;
-	int known_len, given_len, i, result;
+	char *known, *given, *known_given, *a, *b;
+	int known_len, given_len, i, k, result;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &known, &known_len, &given, &given_len) == FAILURE) {
 		return;
 	}
 
-	known_padded = (char *)ecalloc(1, known_len + given_len);
-	memcpy(known, known_padded, known_len);
+	known_given = (char *)emalloc(known_len + given_len);
+	memcpy(known_given, known, known_len);
+	memcpy(known_given + known_len, given, given_len);
 
 	result = known_len - given_len;
+	a = known_given;
+	b = known_given + known_len;
 
 	for (i = 0; i < given_len; ++i) {
-		result |= given[i] ^ known_padded[i];
+		result |= *a++ ^ *b++;
 	}
 
-	efree(known_padded);
+	efree(known_given);
 
 	RETVAL_BOOL(result == 0);
 }
