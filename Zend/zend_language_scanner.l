@@ -1067,6 +1067,10 @@ NEWLINE ("\r"|"\n"|"\r\n")
 	return T_ELSE;
 }
 
+<ST_IN_SCRIPTING>"unless" {
+	return T_UNLESS;
+}
+
 <ST_IN_SCRIPTING>"while" {
 	return T_WHILE;
 }

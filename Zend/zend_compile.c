@@ -1222,6 +1222,26 @@ void zend_do_post_incdec(znode *result, const znode *op1, zend_uchar op TSRMLS_D
 }
 /* }}} */
 
+void zend_do_unless_start(znode *closing_bracket_token TSRMLS_DC)
+{
+	int last_op_number = get_next_op_number(CG(active_op_array));
+	zend_op *opline = get_next_op(CG(active_op_array) TSRMLS_CC);
+
+	MAKE_NOP(opline);
+	closing_bracket_token->u.op.opline_num = last_op_number;
+}
+
+void zend_do_unless_end(const znode *cond, const znode *closing_bracket_token TSRMLS_DC)
+{
+	int next_op_number = get_next_op_number(CG(active_op_array));
+	zend_op *opline = &CG(active_op_array)->opcodes[closing_bracket_token->u.op.opline_num];
+
+	opline->opcode = ZEND_JMPNZ;
+	SET_NODE(opline->op1, cond);
+	SET_UNUSED(opline->op2);
+	opline->op2.opline_num = next_op_number;
+}
+
 void zend_do_if_cond(const znode *cond, znode *closing_bracket_token TSRMLS_DC) /* {{{ */
 {
 	int if_cond_op_number = get_next_op_number(CG(active_op_array));
