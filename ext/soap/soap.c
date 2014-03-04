@@ -2607,6 +2607,19 @@ static int do_request(zval *this_ptr, xmlDoc *request, char *location, char *act
   return ret;
 }
 
+static int do_handle_response(zval *this_ptr, zval *response, sdlFunctionPtr fn, char *fn_name, zval *return_value, zval *output_headers TSRMLS_DC)
+{
+	int ret = TRUE;
+
+	if (Z_TYPE_P(response) == IS_STRING) {
+		encode_reset_ns();
+		ret = parse_packet_soap(this_ptr, Z_STRVAL_P(response), Z_STRLEN_P(response), fn, NULL, return_value, output_headers TSRMLS_CC);
+		encode_finish();
+	}
+
+	return ret;
+}
+
 static void do_soap_call(zval* this_ptr,
                          char* function,
                          int function_len,
@@ -2718,10 +2731,8 @@ static void do_soap_call(zval* this_ptr,
 
 				xmlFreeDoc(request);
 
-				if (ret && Z_TYPE(response) == IS_STRING) {
-					encode_reset_ns();
-					ret = parse_packet_soap(this_ptr, Z_STRVAL(response), Z_STRLEN(response), fn, NULL, return_value, output_headers TSRMLS_CC);
-					encode_finish();
+				if (ret) {
+					ret = do_handle_response(this_ptr, &response, fn, NULL, return_value, output_headers TSRMLS_CC);
 				}
 
 				zval_dtor(&response);
@@ -2764,9 +2775,7 @@ static void do_soap_call(zval* this_ptr,
 				xmlFreeDoc(request);
 
 				if (ret && Z_TYPE(response) == IS_STRING) {
-					encode_reset_ns();
-					ret = parse_packet_soap(this_ptr, Z_STRVAL(response), Z_STRLEN(response), NULL, function, return_value, output_headers TSRMLS_CC);
-					encode_finish();
+					ret = do_handle_response(this_ptr, &response, NULL, function, return_value, output_headers TSRMLS_CC);
 				}
 
 				zval_dtor(&response);
