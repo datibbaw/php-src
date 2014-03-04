@@ -2639,8 +2639,8 @@ static void do_handle_response(zval *this_ptr, zval *response, char *function, i
 
 	if (zend_hash_find(Z_OBJPROP_P(this_ptr), "trace", sizeof("trace"), (void **) &trace) == SUCCESS
 		&& Z_LVAL_PP(trace) > 0) {
-		zend_hash_del(Z_OBJPROP_P(this_ptr), "__last_request", sizeof("__last_request"));
-		zend_hash_del(Z_OBJPROP_P(this_ptr), "__last_response", sizeof("__last_response"));
+//		zend_hash_del(Z_OBJPROP_P(this_ptr), "__last_response", sizeof("__last_response"));
+		add_property_stringl(this_ptr, "__last_response", Z_STRVAL_P(response), Z_STRLEN_P(response), 1);
 	}
 
 	if (FIND_SDL_PROPERTY(this_ptr,tmp) != FAILURE) {
