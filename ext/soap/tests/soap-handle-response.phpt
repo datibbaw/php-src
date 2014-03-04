@@ -17,6 +17,17 @@ $client = new SoapClient(null, [
 
 var_dump($client->__handleResponse($response, 'test'));
 
+$response = <<<EOS
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><SOAP-ENV:Fault><faultcode>SOAP-ENV:Server</faultcode><faultstring>WSDL generation is not supported yet</faultstring></SOAP-ENV:Fault></SOAP-ENV:Body></SOAP-ENV:Envelope>
+EOS;
+
+try {
+	var_dump($client->__handleResponse($response, 'test'));
+} catch (\SoapFault $f) {
+	echo $f->faultcode, ' ', $f->faultstring, PHP_EOL;
+}
+
 ?>
 --EXPECT--
 string(11) "Hello World"
+SOAP-ENV:Server WSDL generation is not supported yet

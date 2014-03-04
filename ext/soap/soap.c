@@ -2630,20 +2630,60 @@ static int do_parse_response(zval *this_ptr, zval *response, sdlFunctionPtr fn, 
 
 static void do_handle_response(zval *this_ptr, zval *response, char *function, int function_len, zval *return_value, zval *output_headers TSRMLS_DC)
 {
-	zval **tmp;
+	zval **tmp, **trace;
  	sdlFunctionPtr fn;
 	int ret = FALSE;
  	sdlPtr sdl = NULL;
 
+	SOAP_CLIENT_BEGIN_CODE();
+
+	if (zend_hash_find(Z_OBJPROP_P(this_ptr), "trace", sizeof("trace"), (void **) &trace) == SUCCESS
+		&& Z_LVAL_PP(trace) > 0) {
+		zend_hash_del(Z_OBJPROP_P(this_ptr), "__last_request", sizeof("__last_request"));
+		zend_hash_del(Z_OBJPROP_P(this_ptr), "__last_response", sizeof("__last_response"));
+	}
+
 	if (FIND_SDL_PROPERTY(this_ptr,tmp) != FAILURE) {
 		FETCH_SDL_RES(sdl,tmp);
 	}
+ 	clear_soap_fault(this_ptr TSRMLS_CC);
  	if (sdl != NULL) {
  		fn = get_function(sdl, function);
  		ret = do_parse_response(this_ptr, response, fn, NULL, return_value, output_headers TSRMLS_CC);
  	} else {
 		ret = do_parse_response(this_ptr, response, NULL, function, return_value, output_headers TSRMLS_CC);
  	}
+
+ 	if (!ret) {
+		zval** fault;
+		if (zend_hash_find(Z_OBJPROP_P(this_ptr), "__soap_fault", sizeof("__soap_fault"), (void **) &fault) == SUCCESS) {
+			*return_value = **fault;
+			zval_copy_ctor(return_value);
+		} else {
+			*return_value = *add_soap_fault(this_ptr, "Client", "Unknown Error", NULL, NULL TSRMLS_CC);
+			zval_copy_ctor(return_value);
+		}
+	} else {
+		zval** fault;
+		if (zend_hash_find(Z_OBJPROP_P(this_ptr), "__soap_fault", sizeof("__soap_fault"), (void **) &fault) == SUCCESS) {
+			*return_value = **fault;
+			zval_copy_ctor(return_value);
+		}
+	}
+
+ 	if (!EG(exception) &&
+	    Z_TYPE_P(return_value) == IS_OBJECT &&
+	    instanceof_function(Z_OBJCE_P(return_value), soap_fault_class_entry TSRMLS_CC) &&
+	    (zend_hash_find(Z_OBJPROP_P(this_ptr), "_exceptions", sizeof("_exceptions"), (void **) &tmp) != SUCCESS ||
+		   Z_TYPE_PP(tmp) != IS_BOOL || Z_LVAL_PP(tmp) != 0)) {
+		zval *exception;
+
+		MAKE_STD_ZVAL(exception);
+		MAKE_COPY_ZVAL(&return_value, exception);
+		zend_throw_exception_object(exception TSRMLS_CC);
+	}
+
+	SOAP_CLIENT_END_CODE();
 }
 
 static void do_soap_call(zval* this_ptr,
@@ -3160,6 +3200,7 @@ PHP_METHOD(SoapClient, __handleResponse)
 	if (output_headers) {
 		array_init(output_headers);
 	}
+
 	do_handle_response(this_ptr, response, function, function_len, return_value, output_headers TSRMLS_CC);
 }
 
