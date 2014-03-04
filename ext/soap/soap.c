@@ -224,6 +224,7 @@ PHP_METHOD(SoapClient, __getLastResponseHeaders);
 PHP_METHOD(SoapClient, __getFunctions);
 PHP_METHOD(SoapClient, __getTypes);
 PHP_METHOD(SoapClient, __doRequest);
+PHP_METHOD(SoapClient, __handleResponse);
 PHP_METHOD(SoapClient, __setCookie);
 PHP_METHOD(SoapClient, __setLocation);
 PHP_METHOD(SoapClient, __setSoapHeaders);
@@ -363,6 +364,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_soapclient___dorequest, 0, 0, 4)
 	ZEND_ARG_INFO(0, one_way)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_soapclient___handleresponse, 0, 0, 2)
+	ZEND_ARG_INFO(0, response)
+	ZEND_ARG_INFO(0, function)
+	ZEND_ARG_INFO(0, output_headers)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_soapclient___setcookie, 0, 0, 1)
 	ZEND_ARG_INFO(0, name)
 	ZEND_ARG_INFO(0, value)
@@ -421,6 +428,7 @@ static const zend_function_entry soap_client_functions[] = {
 	PHP_ME(SoapClient, __getFunctions, 				arginfo_soapclient___getfunctions, 0)
 	PHP_ME(SoapClient, __getTypes, 					arginfo_soapclient___gettypes, 0)
 	PHP_ME(SoapClient, __doRequest, 				arginfo_soapclient___dorequest, 0)
+	PHP_ME(SoapClient, __handleResponse,			arginfo_soapclient___handleresponse, 0)
 	PHP_ME(SoapClient, __setCookie, 				arginfo_soapclient___setcookie, 0)
 	PHP_ME(SoapClient, __setLocation, 				arginfo_soapclient___setlocation, 0)
 	PHP_ME(SoapClient, __setSoapHeaders, 			arginfo_soapclient___setsoapheaders, 0)
@@ -2607,7 +2615,7 @@ static int do_request(zval *this_ptr, xmlDoc *request, char *location, char *act
   return ret;
 }
 
-static int do_handle_response(zval *this_ptr, zval *response, sdlFunctionPtr fn, char *fn_name, zval *return_value, zval *output_headers TSRMLS_DC)
+static int do_parse_response(zval *this_ptr, zval *response, sdlFunctionPtr fn, char *fn_name, zval *return_value, zval *output_headers TSRMLS_DC)
 {
 	int ret = TRUE;
 
@@ -2618,6 +2626,24 @@ static int do_handle_response(zval *this_ptr, zval *response, sdlFunctionPtr fn,
 	}
 
 	return ret;
+}
+
+static void do_handle_response(zval *this_ptr, zval *response, char *function, int function_len, zval *return_value, zval *output_headers TSRMLS_DC)
+{
+	zval **tmp;
+ 	sdlFunctionPtr fn;
+	int ret = FALSE;
+ 	sdlPtr sdl = NULL;
+
+	if (FIND_SDL_PROPERTY(this_ptr,tmp) != FAILURE) {
+		FETCH_SDL_RES(sdl,tmp);
+	}
+ 	if (sdl != NULL) {
+ 		fn = get_function(sdl, function);
+ 		ret = do_parse_response(this_ptr, response, fn, NULL, return_value, output_headers TSRMLS_CC);
+ 	} else {
+		ret = do_parse_response(this_ptr, response, NULL, function, return_value, output_headers TSRMLS_CC);
+ 	}
 }
 
 static void do_soap_call(zval* this_ptr,
@@ -2732,7 +2758,7 @@ static void do_soap_call(zval* this_ptr,
 				xmlFreeDoc(request);
 
 				if (ret) {
-					ret = do_handle_response(this_ptr, &response, fn, NULL, return_value, output_headers TSRMLS_CC);
+					ret = do_parse_response(this_ptr, &response, fn, NULL, return_value, output_headers TSRMLS_CC);
 				}
 
 				zval_dtor(&response);
@@ -2775,7 +2801,7 @@ static void do_soap_call(zval* this_ptr,
 				xmlFreeDoc(request);
 
 				if (ret && Z_TYPE(response) == IS_STRING) {
-					ret = do_handle_response(this_ptr, &response, NULL, function, return_value, output_headers TSRMLS_CC);
+					ret = do_parse_response(this_ptr, &response, NULL, function, return_value, output_headers TSRMLS_CC);
 				}
 
 				zval_dtor(&response);
@@ -3120,6 +3146,22 @@ PHP_METHOD(SoapClient, __doRequest)
 	RETURN_NULL();
 }
 /* }}} */
+
+PHP_METHOD(SoapClient, __handleResponse)
+{
+	zval *response, *output_headers = NULL;
+	char *function;
+	int function_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zs|z", &response, &function, &function_len, &output_headers) == FAILURE) {
+		return;
+	}
+
+	if (output_headers) {
+		array_init(output_headers);
+	}
+	do_handle_response(this_ptr, response, function, function_len, return_value, output_headers TSRMLS_CC);
+}
 
 /* {{{ proto void SoapClient::__setCookie(string name [, strung value])
    Sets cookie thet will sent with SOAP request.
