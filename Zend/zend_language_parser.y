@@ -867,6 +867,17 @@ expr_without_variable:
 			zend_do_begin_dynamic_function_call(&$2, 0 TSRMLS_CC);
 			zend_do_end_function_call(&$2, &generator_instance_node, 0, 1 TSRMLS_CC);
 			zend_do_extended_fcall_end(TSRMLS_C);
+			{
+				znode function_node;
+
+				function_node.op_type = IS_CONST;
+				ZVAL_STRING(&function_node.u.constant, "iterator_to_array", 1);
+
+				zend_do_begin_function_call(&function_node, 0 TSRMLS_CC);
+				zend_do_pass_param(&generator_instance_node, ZEND_SEND_VAL TSRMLS_CC);
+				zend_do_end_function_call(&function_node, &$$, 0, 0 TSRMLS_CC);
+				zend_do_extended_fcall_end(TSRMLS_C);
+			}
 		}
 ;
 
