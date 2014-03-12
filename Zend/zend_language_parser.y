@@ -856,7 +856,7 @@ expr_without_variable:
 		'(' parameter_list ')' lexical_vars
 		'{' inner_statement_list '}' { zend_do_end_function_declaration(&$2 TSRMLS_CC); $$ = $4; }
 	|	'[' {
-			zend_do_begin_lambda_function_declaration(&$$, &$1, 1, 0 TSRMLS_CC);
+			zend_do_begin_lambda_function_declaration(&$$, &$1, 0, 0 TSRMLS_CC);
 		}
 		generator_expression_foreach
 		']' {
