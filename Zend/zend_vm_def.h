@@ -5672,4 +5672,27 @@ ZEND_VM_HANDLER(167, ZEND_ASSIGN_POW, VAR|UNUSED|CV, CONST|TMP|VAR|UNUSED|CV)
 	ZEND_VM_DISPATCH_TO_HELPER_EX(zend_binary_assign_op_helper, binary_op,pow_function);
 }
 
+ZEND_VM_HANDLER(168, ZEND_INHERIT_PARENT_SYMTABLE, ANY, ANY)
+{
+	HashTable *symbol_table;
+
+	/* Make sure that the parent scope has a symbol table. As
+	 * zend_rebuild_symbol_table() acts upon EG(current_execute_data) we
+	 * have to temporarily set it to the parent scope and then set it back. */
+	EG(current_execute_data) = EX(prev_execute_data);
+	zend_rebuild_symbol_table(TSRMLS_C);
+	EG(current_execute_data) = execute_data;
+
+	/* Create a new symbol table into which the parent symbol table is copied.
+	 * The parent symbol table was put into EG(active_symbol_table) by
+	 * zend_rebuild_symbol_table(). Then set EG(active_symbol_table) to the
+	 * newly created copy of the parent table. */
+	ALLOC_HASHTABLE(symbol_table);
+	zend_hash_init(symbol_table, zend_hash_num_elements(EG(active_symbol_table)), NULL, ZVAL_PTR_DTOR, 0);
+	zend_hash_copy(symbol_table, EG(active_symbol_table), (copy_ctor_func_t) zval_add_ref, NULL, sizeof(zval *));
+	EG(active_symbol_table) = symbol_table;
+
+	ZEND_VM_NEXT_OPCODE();
+}
+
 ZEND_VM_EXPORT_HELPER(zend_do_fcall, zend_do_fcall_common_helper)

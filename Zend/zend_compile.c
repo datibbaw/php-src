@@ -7416,6 +7416,12 @@ void zend_do_constant_expression(znode *result, zend_ast *ast TSRMLS_DC) /* {{{ 
 }
 /* }}} */
 
+void zend_do_inherit_parent_symtable(TSRMLS_D)
+{
+	zend_op *opline = get_next_op(CG(active_op_array) TSRMLS_CC);
+	opline->opcode = ZEND_INHERIT_PARENT_SYMTABLE;
+}
+
 /* {{{ zend_dirname
    Returns directory name component of path */
 ZEND_API size_t zend_dirname(char *path, size_t len)

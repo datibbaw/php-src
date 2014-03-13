@@ -1383,6 +1383,29 @@ static int ZEND_FASTCALL  ZEND_FAST_RET_SPEC_HANDLER(ZEND_OPCODE_HANDLER_ARGS)
 	}
 }
 
+static int ZEND_FASTCALL  ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER(ZEND_OPCODE_HANDLER_ARGS)
+{
+	HashTable *symbol_table;
+
+	/* Make sure that the parent scope has a symbol table. As
+	 * zend_rebuild_symbol_table() acts upon EG(current_execute_data) we
+	 * have to temporarily set it to the parent scope and then set it back. */
+	EG(current_execute_data) = EX(prev_execute_data);
+	zend_rebuild_symbol_table(TSRMLS_C);
+	EG(current_execute_data) = execute_data;
+
+	/* Create a new symbol table into which the parent symbol table is copied.
+	 * The parent symbol table was put into EG(active_symbol_table) by
+	 * zend_rebuild_symbol_table(). Then set EG(active_symbol_table) to the
+	 * newly created copy of the parent table. */
+	ALLOC_HASHTABLE(symbol_table);
+	zend_hash_init(symbol_table, zend_hash_num_elements(EG(active_symbol_table)), NULL, ZVAL_PTR_DTOR, 0);
+	zend_hash_copy(symbol_table, EG(active_symbol_table), (copy_ctor_func_t) zval_add_ref, NULL, sizeof(zval *));
+	EG(active_symbol_table) = symbol_table;
+
+	ZEND_VM_NEXT_OPCODE();
+}
+
 static int ZEND_FASTCALL  ZEND_FETCH_CLASS_SPEC_CONST_HANDLER(ZEND_OPCODE_HANDLER_ARGS)
 {
 	USE_OPLINE
@@ -45425,6 +45448,31 @@ void zend_init_opcodes_handlers(void)
   	ZEND_ASSIGN_POW_SPEC_CV_VAR_HANDLER,
   	ZEND_ASSIGN_POW_SPEC_CV_UNUSED_HANDLER,
   	ZEND_ASSIGN_POW_SPEC_CV_CV_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
+  	ZEND_INHERIT_PARENT_SYMTABLE_SPEC_HANDLER,
   	ZEND_NULL_HANDLER
   };
   zend_opcode_handlers = (opcode_handler_t*)labels;
