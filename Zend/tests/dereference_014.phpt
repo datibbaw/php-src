@@ -27,8 +27,12 @@ var_dump($h);
 
 ?>
 --EXPECTF--
+Notice: Cannot use variable as array in %s on line %d
+
 Notice: Trying to get property of non-object in %s on line %d
 NULL
+
+Notice: Cannot use variable as array in %s on line %d
 
 Notice: Trying to get property of non-object in %s on line %d
 NULL

@@ -1258,11 +1258,6 @@ static void zend_fetch_dimension_address_read(temp_variable *result, zval *conta
 			PZVAL_LOCK(*retval);
 			return;
 
-		case IS_NULL:
-			result->var.ptr = &EG(uninitialized_zval);
-			PZVAL_LOCK(&EG(uninitialized_zval));
-			return;
-
 		case IS_STRING: {
 				zval tmp;
 				zval *ptr;
@@ -1346,9 +1341,9 @@ static void zend_fetch_dimension_address_read(temp_variable *result, zval *conta
 			return;
 
 		default:
+			zend_error(E_NOTICE, "Cannot use variable as array");
 			result->var.ptr = &EG(uninitialized_zval);
 			PZVAL_LOCK(&EG(uninitialized_zval));
-			return;
 	}
 }
 

@@ -20,9 +20,39 @@ $arr[][]->bar = 2;
 
 Notice: Undefined variable: arr in %s on line %d
 
-Notice: Undefined variable: arr in %s on line %d
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
 
 Notice: Undefined variable: arr in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Undefined variable: arr in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
 
 Notice: Trying to get property of non-object in %s on line %d
 

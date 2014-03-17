@@ -13,6 +13,7 @@ var_dump($var1);
 echo "Done\n";
 ?>
 --EXPECTF--	
+Notice: Cannot use variable as array in %s on line %d
 NULL
 NULL
 Done

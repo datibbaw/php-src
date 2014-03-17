@@ -17,8 +17,11 @@ class test {
 
 $test1 = new test();
 ?>
---EXPECT--
+--EXPECTF--
+Notice: Cannot use variable as array in %s on line %d
 test1
+
+Notice: Cannot use variable as array in %s on line %d
 test2
 test1
 test2

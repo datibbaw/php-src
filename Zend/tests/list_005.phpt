@@ -39,6 +39,12 @@ string(1) "f"
 string(1) "o"
 string(1) "o"
 ----
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
+
+Notice: Cannot use variable as array in %s on line %d
 NULL
 NULL
 NULL

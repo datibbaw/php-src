@@ -25,13 +25,30 @@ var_dump($null[$arr]);
 echo "Done\n";
 ?>
 --EXPECTF--	
+Notice: Cannot use variable as array in %s on line %d
 NULL
+
+Notice: Cannot use variable as array in %s on line %d
 NULL
+
+Notice: Cannot use variable as array in %s on line %d
 NULL
+
+Notice: Cannot use variable as array in %s on line %d
 NULL
+
+Notice: Cannot use variable as array in %s on line %d
 NULL
+
+Notice: Cannot use variable as array in %s on line %d
 NULL
+
+Notice: Cannot use variable as array in %s on line %d
 NULL
+
+Notice: Cannot use variable as array in %s on line %d
 NULL
+
+Notice: Cannot use variable as array in %s on line %d
 NULL
 Done
