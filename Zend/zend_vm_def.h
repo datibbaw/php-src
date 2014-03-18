@@ -5691,7 +5691,9 @@ ZEND_VM_HANDLER(168, ZEND_INHERIT_PARENT_SYMTABLE, ANY, ANY)
 	zend_hash_init(symbol_table, zend_hash_num_elements(EG(active_symbol_table)), NULL, ZVAL_PTR_DTOR, 0);
 	zend_hash_copy(symbol_table, EG(active_symbol_table), (copy_ctor_func_t) zval_add_ref, NULL, sizeof(zval *));
 	EG(active_symbol_table) = symbol_table;
+	EX(symbol_table) = symbol_table;
 
+	CHECK_EXCEPTION();
 	ZEND_VM_NEXT_OPCODE();
 }
 
