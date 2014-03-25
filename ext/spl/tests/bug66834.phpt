@@ -35,6 +35,20 @@ class ArrayObjectGet extends ArrayObject
 	}
 }
 
+// overrides only offsetGet and offsetSet
+class ArrayObjectGetSet extends ArrayObject
+{
+	public function offsetGet($offset)
+	{
+		return parent::offsetGet(str_rot13($offset));
+	}
+
+	public function offsetSet($offset, $value)
+	{
+		return parent::offsetSet(str_rot13($offset), $value);
+	}
+}
+
 $values = ['foo' => '', 'bar' => null, 'baz' => 42];
 
 echo "==== class with offsetExists() and offsetGet() ====\n";
@@ -58,8 +72,13 @@ var_dump($object->offsetExists('bar'), isset($object['bar']), empty($object['bar
 var_dump($object->offsetexists('baz'), isset($object['baz']), empty($object['baz']));
 var_dump($object->offsetexists('qux'), isset($object['qux']), empty($object['qux']));
 
+echo "==== class with offsetGet() and offsetSet() ====\n";
+$object = new ArrayObjectGetSet;
+$object['foo'] = 42;
+var_dump($object->offsetExists('foo'), $object->offsetExists('sbb'), isset($object['foo']), isset($object['sbb']));
+
 ?>
---EXPECT--
+--EXPECTF--
 ==== class with offsetExists() and offsetGet() ====
 string(37) "Called: ArrayObjectBoth::offsetExists"
 string(37) "Called: ArrayObjectBoth::offsetExists"
@@ -135,3 +154,10 @@ bool(false)
 bool(false)
 bool(false)
 bool(true)
+==== class with offsetGet() and offsetSet() ====
+
+Notice: Undefined index: foo in %s on line %d
+bool(false)
+bool(true)
+bool(false)
+bool(false)

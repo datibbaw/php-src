@@ -606,7 +606,7 @@ static int spl_array_has_dimension_ex(int check_inherited, zval *object, zval *o
 			if (check_empty == 2) {
 				return 1;
 			} else if (intern->fptr_offset_get) {
-				value = spl_array_read_dimension_ex(1, object, offset, BP_VAR_R);
+				value = spl_array_read_dimension_ex(1, object, offset, BP_VAR_R TSRMLS_CC);
 			}
 		} else {
 			if (rv) {
@@ -652,7 +652,7 @@ static int spl_array_has_dimension_ex(int check_inherited, zval *object, zval *o
 		}
 
 		if (check_inherited && intern->fptr_offset_get) {
-			value = spl_array_read_dimension_ex(1, object, offset, BP_VAR_R);
+			value = spl_array_read_dimension_ex(1, object, offset, BP_VAR_R TSRMLS_CC);
 		} else {
 			value = *tmp;
 		}
