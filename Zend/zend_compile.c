@@ -6405,7 +6405,7 @@ void zend_do_foreach_cont(znode *foreach_token, const znode *open_brackets_token
 		}
 	}
 
-	if (value->EA & ZEND_PARSED_REFERENCE_VARIABLE) {
+	if (value->EA & ZEND_PARSED_REFERENCE_VARIABLE && (opline-1)->extended_value) {
 		assign_by_ref = 1;
 
 		/* Mark extended_value for assign-by-reference */
