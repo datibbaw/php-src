@@ -227,6 +227,10 @@ process_double:
 		return 0;
 	}
 
+    while (*ptr == ' ' || *ptr == '\t' || *ptr == '\n' || *ptr == '\r' || *ptr == '\v' || *ptr == '\f') {
+		++ptr;
+	}
+
 	if (ptr != str + length) {
 		if (!allow_errors) {
 			return 0;
