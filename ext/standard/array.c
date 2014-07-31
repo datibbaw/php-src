@@ -862,21 +862,33 @@ PHP_FUNCTION(prev)
    Move array argument's internal pointer to the next element and return it */
 PHP_FUNCTION(next)
 {
+	zval *zarr;
 	HashTable *array;
 	zval **entry;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "H", &array) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zarr) == FAILURE) {
 		return;
 	}
 
-	zend_hash_move_forward(array);
+	if (Z_TYPE_P(zarr) == IS_ARRAY) {
+		HashTable *array = HASH_OF(zarr);
+		zend_hash_move_forward(array);
 
-	if (return_value_used) {
-		if (zend_hash_get_current_data(array, (void **) &entry) == FAILURE) {
-			RETURN_FALSE;
+		if (return_value_used) {
+			if (zend_hash_get_current_data(array, (void **) &entry) == FAILURE) {
+				RETURN_FALSE;
+			}
+
+			RETURN_ZVAL_FAST(*entry);
 		}
+	} else if (Z_TYPE_P(zarr) == IS_OBJECT) {
+		zend_class_entry *ce = Z_OBJCE_P(zarr);
 
-		RETURN_ZVAL_FAST(*entry);
+		if (ce && ce->get_iterator) {
+			zend_object_iterator *iter = ce->get_iterator(ce, zarr, 0 TSRMLS_CC);
+
+			iter->funcs->move_forward(iter TSRMLS_CC);
+		}
 	}
 }
 /* }}} */
@@ -885,13 +897,15 @@ PHP_FUNCTION(next)
    Set array argument's internal pointer to the first element and return it */
 PHP_FUNCTION(reset)
 {
+    zval *zarr;
 	HashTable *array;
 	zval **entry;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "H", &array) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zarr) == FAILURE) {
 		return;
 	}
 
+    array = HASH_OF(zarr);
 	zend_hash_internal_pointer_reset(array);
 
 	if (return_value_used) {
@@ -908,18 +922,31 @@ PHP_FUNCTION(reset)
    Return the element currently pointed to by the internal array pointer */
 PHP_FUNCTION(current)
 {
-	HashTable *array;
-	zval **entry;
+    zval *zarr, **entry;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "H", &array) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zarr) == FAILURE) {
 		return;
 	}
 
-	if (zend_hash_get_current_data(array, (void **) &entry) == FAILURE) {
-		RETURN_FALSE;
-	}
+	if (Z_TYPE_P(zarr) == IS_ARRAY) {
+		HashTable *array = HASH_OF(zarr);
+		zval **entry;
 
-	RETURN_ZVAL_FAST(*entry);
+		if (zend_hash_get_current_data(array, (void **) &entry) == FAILURE) {
+			RETURN_FALSE;
+		}
+
+		RETURN_ZVAL_FAST(*entry);
+	} else if (Z_TYPE_P(zarr) == IS_OBJECT) {
+		zend_class_entry *ce = Z_OBJCE_P(zarr);
+
+		if (ce && ce->get_iterator) {
+			zend_object_iterator *iter = ce->get_iterator(ce, zarr, 0 TSRMLS_CC);
+
+			iter->funcs->get_current_data(iter, &entry TSRMLS_CC);
+		}
+		RETURN_ZVAL(*entry, 0, 0);
+	}
 }
 /* }}} */
 
@@ -927,13 +954,26 @@ PHP_FUNCTION(current)
    Return the key of the element currently pointed to by the internal array pointer */
 PHP_FUNCTION(key)
 {
+	zval *zarr, **key;
+
 	HashTable *array;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "H", &array) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zarr) == FAILURE) {
 		return;
 	}
 
-	zend_hash_get_current_key_zval(array, return_value);
+	if (Z_TYPE_P(zarr) == IS_ARRAY) {
+		HashTable *array = HASH_OF(zarr);
+		zend_hash_get_current_key_zval(array, return_value);
+	} else if (Z_TYPE_P(zarr) == IS_OBJECT) {
+		zend_class_entry *ce = Z_OBJCE_P(zarr);
+
+		if (ce && ce->get_iterator) {
+			zend_object_iterator *iter = ce->get_iterator(ce, zarr, 0 TSRMLS_CC);
+
+			iter->funcs->get_current_key(iter, return_value TSRMLS_CC);
+		}
+	}
 }
 /* }}} */
 
