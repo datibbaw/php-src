@@ -2172,20 +2172,18 @@ double_quotes_scan_done:
 						end++;
 					}
 
-					if (*end == '\n' || *end == '\r') {
-						/* newline before label will be subtracted from returned text, but
-						 * yyleng/yytext will include it, for zend_highlight/strip, tokenizer, etc. */
-						if (YYCURSOR[-2] == '\r' && YYCURSOR[-1] == '\n') {
-							newline = 2; /* Windows newline */
-						} else {
-							newline = 1;
-						}
-
-						CG(increment_lineno) = 1; /* For newline before label */
-						BEGIN(ST_END_HEREDOC);
-
-						goto heredoc_scan_done;
+					/* newline before label will be subtracted from returned text, but
+					 * yyleng/yytext will include it, for zend_highlight/strip, tokenizer, etc. */
+					if (YYCURSOR[-2] == '\r' && YYCURSOR[-1] == '\n') {
+						newline = 2; /* Windows newline */
+					} else {
+						newline = 1;
 					}
+
+					CG(increment_lineno) = 1; /* For newline before label */
+					BEGIN(ST_END_HEREDOC);
+
+					goto heredoc_scan_done;
 				}
 				continue;
 			case '$':
@@ -2246,7 +2244,7 @@ heredoc_scan_done:
 						end++;
 					}
 
-					if (*end == '\n' || *end == '\r') {
+					if (1/* *end == '\n' || *end == '\r'*/) {
 						/* newline before label will be subtracted from returned text, but
 						 * yyleng/yytext will include it, for zend_highlight/strip, tokenizer, etc. */
 						if (YYCURSOR[-2] == '\r' && YYCURSOR[-1] == '\n') {
