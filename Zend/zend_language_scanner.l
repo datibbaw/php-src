@@ -93,6 +93,8 @@ ZEND_API ts_rsrc_id language_scanner_globals_id;
 ZEND_API zend_php_scanner_globals language_scanner_globals;
 #endif
 
+#define DOC_END_LA "\r\n\t ,.]"
+
 #define HANDLE_NEWLINES(s, l)													\
 do {																			\
 	char *p = (s), *boundary = p+(l);											\
@@ -2172,18 +2174,20 @@ double_quotes_scan_done:
 						end++;
 					}
 
-					/* newline before label will be subtracted from returned text, but
-					 * yyleng/yytext will include it, for zend_highlight/strip, tokenizer, etc. */
-					if (YYCURSOR[-2] == '\r' && YYCURSOR[-1] == '\n') {
-						newline = 2; /* Windows newline */
-					} else {
-						newline = 1;
+					if (memchr(DOC_END_LA, *end, sizeof(DOC_END_LA))) {
+						/* newline before label will be subtracted from returned text, but
+						 * yyleng/yytext will include it, for zend_highlight/strip, tokenizer, etc. */
+						if (YYCURSOR[-2] == '\r' && YYCURSOR[-1] == '\n') {
+							newline = 2; /* Windows newline */
+						} else {
+							newline = 1;
+						}
+
+						CG(increment_lineno) = 1; /* For newline before label */
+						BEGIN(ST_END_HEREDOC);
+
+						goto heredoc_scan_done;
 					}
-
-					CG(increment_lineno) = 1; /* For newline before label */
-					BEGIN(ST_END_HEREDOC);
-
-					goto heredoc_scan_done;
 				}
 				continue;
 			case '$':
@@ -2244,7 +2248,7 @@ heredoc_scan_done:
 						end++;
 					}
 
-					if (1/* *end == '\n' || *end == '\r'*/) {
+					if (memchr(DOC_END_LA, *end, sizeof(DOC_END_LA))) {
 						/* newline before label will be subtracted from returned text, but
 						 * yyleng/yytext will include it, for zend_highlight/strip, tokenizer, etc. */
 						if (YYCURSOR[-2] == '\r' && YYCURSOR[-1] == '\n') {

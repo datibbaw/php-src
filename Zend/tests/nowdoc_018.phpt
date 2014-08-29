@@ -1,26 +1,26 @@
 --TEST--
-Loosen restrictions on Heredoc syntax
+Loosened restrictions on Heredoc syntax
 --FILE--
 <?php
 
-$strings = [<<<EOS
+$strings = [<<<'EOS'
 a
-EOS, <<<EOS
+EOS, <<<'EOS'
 b
 EOS];
 
 class Test
 {
-	const A = <<<EOS
+	const A = <<<'EOS'
 ab
-EOS . <<<EOS
+EOS . <<<'EOS'
 cd
 EOS;
 }
 
 var_dump($strings);
 var_dump(Test::A);
-var_dump(eval("return <<<EOS\nfoo\nEOS;"));
+var_dump(eval("return <<<'EOS'\nfoo\nEOS;"));
 ?>
 --EXPECT--
 array(2) {
