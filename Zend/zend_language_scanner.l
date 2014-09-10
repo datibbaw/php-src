@@ -93,8 +93,6 @@ ZEND_API ts_rsrc_id language_scanner_globals_id;
 ZEND_API zend_php_scanner_globals language_scanner_globals;
 #endif
 
-#define DOC_END_LA "\r\n\t ,.]"
-
 #define HANDLE_NEWLINES(s, l)													\
 do {																			\
 	char *p = (s), *boundary = p+(l);											\
@@ -2248,7 +2246,7 @@ heredoc_scan_done:
 						end++;
 					}
 
-					if (memchr(DOC_END_LA, *end, sizeof(DOC_END_LA))) {
+					if (!(IS_LABEL_START(*end) || isdigit(*end))) {
 						/* newline before label will be subtracted from returned text, but
 						 * yyleng/yytext will include it, for zend_highlight/strip, tokenizer, etc. */
 						if (YYCURSOR[-2] == '\r' && YYCURSOR[-1] == '\n') {
