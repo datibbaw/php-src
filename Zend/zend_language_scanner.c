@@ -2043,7 +2043,7 @@ yy105:
 						end++;
 					}
 
-					if (memchr(DOC_END_LA, *end, sizeof(DOC_END_LA))) {
+					if (!(IS_LABEL_START(*end) || isdigit(*end))) {
 						/* newline before label will be subtracted from returned text, but
 						 * yyleng/yytext will include it, for zend_highlight/strip, tokenizer, etc. */
 						if (YYCURSOR[-2] == '\r' && YYCURSOR[-1] == '\n') {

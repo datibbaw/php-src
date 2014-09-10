@@ -21,6 +21,11 @@ EOS;
 var_dump($strings);
 var_dump(Test::A);
 var_dump(eval("return <<<EOS\nfoo\nEOS;"));
+if (!<<<EOS
+0
+EOS) {
+	echo "Done\n";
+}
 ?>
 --EXPECT--
 array(2) {
@@ -31,3 +36,4 @@ array(2) {
 }
 string(4) "abcd"
 string(3) "foo"
+Done
